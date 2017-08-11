@@ -9,7 +9,7 @@ echo "  $ reset_ble          # Reset the BLE device (no arguments) "
 echo
 echo
 
-if [ $1 == restart ]
+if [ "$1" == "restart" ]
 then
    echo "Restarting BLE ----"
    sudo systemctl stop bluetooth
@@ -19,8 +19,8 @@ then
    sudo systemctl status bluetooth
    echo ""
    echo "Done."
-   exit 
-fi 
+   exit
+fi
 
 echo "Resetting BLE ----"
 echo "  Power off ble"
@@ -41,3 +41,4 @@ sleep 3
 echo "  Status"
 systemctl status bluetooth
 echo "Done."
+
