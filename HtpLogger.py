@@ -44,6 +44,7 @@ class HtpLogger(object):
     INFO     = logging.INFO
     WARNING  = logging.WARNING
     ERROR    = logging.ERROR
+    CRITICAL = logging.CRITICAL
     
     LOG_PATH = "/home/pi/htplogs/"
     MAX_FILE_SIZE = 1000000
@@ -115,7 +116,15 @@ class HtpLogger(object):
 
         def critical(self, msg, *args, **kwargs):
             self.logger.critical(msg, *args, **kwargs)
-    
+
+        # Prints to console regardless of the logging level
+        #   bypassing the console formatter.
+        # Typically used to print a message to the console when
+        #   the console logging level is null.
+        # Also writes to the log as INFO
+        def console(self, msg, *args, **kwargs):
+            print(msg)
+            self.logger.info(msg, *args, **kwargs)
     
     
 def f1():
