@@ -13,9 +13,9 @@ QUEUE_GET_TIMEOUT = 0.002
 class CounterDataQueue:
     instance = None
     
-    def __init__(self):
+    def __init__(self, supressQueueFullWarning = False):
         if not CounterDataQueue.instance:
-            CounterDataQueue.instance = CounterDataQueue.__CounterDataQueue()
+            CounterDataQueue.instance = CounterDataQueue.__CounterDataQueue(supressQueueFullWarning)
 
     # Proxy for inner class
     def __getattr__(self, name):
@@ -28,9 +28,10 @@ class CounterDataQueue:
         cntrQ = None
         log = None
         
-        def __init__(self):
+        def __init__(self, supressQueueFullWarning):
             self.log = HtpLogger.get()
             self.cntrQ = queue.Queue(maxsize=QUEUE_MAX_SIZE)
+            self.supressQueueFullWarning = supressQueueFullWarning
    
         def __str__(self):
             return repr(self)
@@ -39,7 +40,8 @@ class CounterDataQueue:
             try:
                 self.cntrQ.put(v, True, QUEUE_PUT_TIMEOUT)
             except (queue.Full):
-                self.log.warning("Counter Data Queue is full, value dropped: " + str(v))
+                if (not self.supressQueueFullWarning):
+                    self.log.warning("Counter Data Queue is full, value dropped: " + str(v))
                 return
                 
         def get(self):
