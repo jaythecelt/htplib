@@ -14,6 +14,8 @@ H = GPIO.HIGH
 L = GPIO.LOW
 
 log = HtpLogger.get()
+counterDataDebug = True
+
 
 saveStartTime = 0
 
@@ -44,22 +46,20 @@ def cleanup():
     log.debug("Cleanup humiditySensor")
     GPIO.cleanup()
     
+def setCounterDataDebug(counterDataDebugBoolean):
+    counterDataDebug = counterDataDebugBoolean    
+    
     
 def _initGPIO():
     global startTime
     global endTime
-
     startTime = 0
     endTime = 1
-
-    
     # Pin definitions
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(latchPin, GPIO.OUT)
     GPIO.setup(clkPin, GPIO.OUT)
     GPIO.setup(dataPin, GPIO.IN)
-
-
 
     
 def  _humThread():
@@ -69,6 +69,7 @@ def  _humThread():
 
     scheduleRunning = True
     #Blocks while the schedule is running
+    log.debug("_humThread: running humSched()")
     humSched.run()
     scheduleRunning = False
     log.warning("humThread stopped")
@@ -114,7 +115,8 @@ def _humDataHandler(a = 'default'):
     count = int(float(count)/sampleTime)  # Filter to compensate for variations in the sample period.
 
     diff = rawCount - count
-    log.debug("Count = %d  \t sample time = %f \t diff = %d", count, sampleTime, diff)
+    if (counterDataDebug):
+        log.debug("Count = %d  \t sample time = %f \t diff = %d", count, sampleTime, diff)
     
     ctrQ = counterQueue.CounterDataQueue() # get the counter data queue
     ctrQ.put((0,count))

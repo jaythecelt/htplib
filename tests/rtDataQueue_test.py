@@ -22,6 +22,7 @@ class theThread(threading.Thread):
 
 
 rtq = RTDataQueue()
+rtq.setSupressQueueFullWarning(True)
 
 rtq.put("Data A")
 rtq.put("Data B")
