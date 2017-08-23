@@ -11,17 +11,15 @@
 
 import json
 from HtpLogger import HtpLogger
-from RTDataQueue import RTDataQueue
-
 
 
 class RTEvent(object):
     instance = None
     
-    DI_RISING_EDGE  = 1
-    DI_FALLING_EDGE = 2
+    DI_RISING_EDGE  = "Rising_Edge"
+    DI_FALLING_EDGE = "Falling_Edge"
     
-    EVENT_KEY        = "event"
+    RT_EVENT_KEY     = "rtEvent"
     SENSOR_TYPE_KEY  = "sensorType"
     EVENT_TYPE_KEY   = "eventType"
     LABEL_KEY        = "label"
@@ -42,11 +40,14 @@ class RTEvent(object):
        
         def __init__(self):
             pass
-        
+        '''
+            submit(...) determines if an event has occurred, and if one has, returns json with data
+            about the event.  If no event was detected, None is returned. 
+        '''
         def submit(self, sensorType, label, val, prevVal, eventType, timeMark):
             
             if not self._eventOccured(sensorType, label, val, prevVal, eventType, timeMark):
-                return False
+                return None
             
             eventDict = {}
             eventDict[RTEvent.SENSOR_TYPE_KEY] = sensorType
@@ -56,15 +57,12 @@ class RTEvent(object):
             eventDict[RTEvent.FORMULA_TIME_KEY] = timeMark
             
             parentDict = {}
-            parentDict[RTEvent.EVENT_KEY] = eventDict
-            eventJson = json.dumps(parentDict)
-            
-            rtQueue = RTDataQueue()
-            rtQueue.put(eventJson)
+            parentDict[RTEvent.RT_EVENT_KEY] = eventDict
+            eventJson = json.dumps(parentDict, sort_keys=True)
             
             HtpLogger.get().debug("Event detected: {0}".format(eventJson))
             
-            return True
+            return eventJson
         
 
         def _eventOccured(self, sensorType, label, val, prevVal, eventType, timeMark ):
